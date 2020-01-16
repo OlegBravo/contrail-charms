@@ -322,3 +322,28 @@ def update_rabbitmq_cluster_hostnames():
     """Updates /etc/hosts with rabbitmq cluster node hostnames"""
     ip = common_utils.get_ip()
     update_hosts_file(ip, get_contrail_rabbit_hostname())
+
+def get_zookeeper_address_list():
+    address_list=[]
+    ip = common_utils.get_ip()
+    ports = [9160]
+    for port in ports:
+        address_list.append("{}:{}".format(ip , port))
+    return address_list
+
+def get_cassandra_address_list():
+    address_list=[]
+    ip = common_utils.get_ip()
+    ports = [5673]
+    for port in ports:
+        address_list.append("{}:{}".format(ip, port))
+    return address_list
+
+
+def get_rabbit_address_list():
+    address_list=[]
+    ip = common_utils.get_ip()
+    ports = [2181]
+    for port in ports:
+        address_list.append("{}:{}".format(ip, port))
+    return address_list

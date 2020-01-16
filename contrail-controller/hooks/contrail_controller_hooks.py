@@ -277,6 +277,33 @@ def update_southbound_relations(rid=None):
         "ca-cert": config.get("ca_cert"),
     }
     for rid in ([rid] if rid else relation_ids("contrail-controller")):
+
+        for unit in related_units(rid):
+            utype = relation_get('unit-type', unit, rid)
+            if utype == "isuu" :
+                rabbit_info = {
+                    "rabbit_user": "guest",
+                    "rabbit_password": "guest",
+                    "rabbit_q_name": "vnc-config.issu-queue",
+                    "rabbit_vhost": "contrail",
+                    "rabbit_port": "5672",
+                    "rabbit_address_list": utils.get_rabbit_address_list()[0],
+                }
+
+                cassandra_info = {
+                    "cassandra_user": "admin",
+                    "cassandra_password": "pusto",
+                    "cassandra_address_list": utils.get_cassandra_address_list(),
+                }
+
+                zookeper_info = {
+                    "zookeeper_address_list": utils.get_zookeeper_address_list(),
+                }
+
+                relation_set(relation_id , relation_rabbit=rabbit_info , relation_cassandra=cassandra_info , relation_zookeper=zookeper_info )
+
+# последнюю строчку надо закинуть - которая описывает ssh-доцупы
+
         relation_set(relation_id=rid, relation_settings=settings)
 
 
@@ -554,6 +581,15 @@ def tls_certificates_relation_departed():
 def nrpe_external_master_relation_changed():
     update_nrpe_config()
 
+@hooks.hook('issu-relation-changed')
+def issu_relation_changed():
+    data = relation_get()
+
+    #взять и распечатать новые данные для карузе
+
+    print(data["rabbit_info"]["address_list"])
+
+#взять
 
 def update_nrpe_config():
     plugins_dir = '/usr/local/lib/nagios/plugins'
