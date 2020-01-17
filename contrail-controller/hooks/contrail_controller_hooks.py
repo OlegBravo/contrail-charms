@@ -55,8 +55,8 @@ def install():
 
 @hooks.hook("leader-elected")
 def leader_elected():
-    for var_name in [("ip","unit-address","control-network"),
-                     ("data_ip","data-address","data-network")]:
+    for var_name in [("ip", "unit-address", "control-network"),
+                     ("data_ip", "data-address", "data-network")]:
         ip_list = common_utils.json_loads(leader_get("controller_{}_list".format(var_name[0])), list())
         ips = utils.get_controller_ips(var_name[1], var_name[2])
         if not ip_list:
@@ -280,8 +280,8 @@ def update_southbound_relations(rid=None):
 
         for unit in related_units(rid):
             utype = relation_get('unit-type', unit, rid)
-            log("Utype =  " + utype )
-            if utype == "issu" :
+            log("Utype =  " + utype)
+            if utype == "issu":
                 log("123 utype == issu")
                 rabbit_info = {
                     "rabbit_user": "guest",
@@ -290,7 +290,7 @@ def update_southbound_relations(rid=None):
                     "rabbit_vhost": "contrail",
                     "rabbit_port": "5672",
                     # "rabbit_address_list": ,
-                    "rabbit_address_list":"127.0.0.1",
+                    "rabbit_address_list": "127.0.0.1",
                 }
 
                 cassandra_info = {
@@ -305,8 +305,9 @@ def update_southbound_relations(rid=None):
                     "zookeeper_address_list": "127.0.0.1",
                 }
 
-                relation_set(relation_id , relation_rabbit=rabbit_info , relation_cassandra=cassandra_info , relation_zookeper=zookeper_info )
-# последнюю строчку надо закинуть - которая описывает ssh-доцупы
+                relation_set(relation_id, relation_rabbit=rabbit_info, relation_cassandra=cassandra_info,
+                             relation_zookeper=zookeper_info)
+        # последнюю строчку надо закинуть - которая описывает ssh-доцупы
 
         relation_set(relation_id=rid, relation_settings=settings)
 
@@ -408,7 +409,7 @@ def contrail_auth_changed():
 @hooks.hook("contrail-auth-relation-departed")
 def contrail_auth_departed():
     units = [unit for rid in relation_ids("contrail-auth")
-                  for unit in related_units(rid)]
+             for unit in related_units(rid)]
     if units:
         return
     config.pop("auth_info", None)
@@ -489,16 +490,16 @@ def _https_services_tcp(vip):
          "service_host": vip,
          "service_port": 8143,
          "service_options": [
-            "timeout client 86400000",
-            "mode tcp",
-            "option tcplog",
-            "balance source",
-            "cookie SERVERID insert indirect nocache",
-            "timeout server 30000",
-            "timeout connect 4000",
+             "timeout client 86400000",
+             "mode tcp",
+             "option tcplog",
+             "balance source",
+             "cookie SERVERID insert indirect nocache",
+             "timeout server 30000",
+             "timeout connect 4000",
          ],
          "servers": [[name, addr, 8143,
-            "cookie " + addr + " weight 1 maxconn 1024 check port 8143"]]},
+                      "cookie " + addr + " weight 1 maxconn 1024 check port 8143"]]},
     ]
 
 
@@ -511,21 +512,21 @@ def _https_services_http(vip):
          "service_port": 8143,
          "crts": ["DEFAULT"],
          "service_options": [
-            "timeout client 86400000",
-            "mode http",
-            "balance source",
-            "timeout server 30000",
-            "timeout connect 4000",
-            "hash-type consistent",
-            "http-request set-header X-Forwarded-Proto https if { ssl_fc }",
-            "http-request set-header X-Forwarded-Proto http if !{ ssl_fc }",
-            "option httpchk GET /",
-            "option forwardfor",
-            "redirect scheme https code 301 if { hdr(host) -i " + str(vip) + " } !{ ssl_fc }",
-            "rsprep ^Location:\\ http://(.*) Location:\\ https://\\1",
+             "timeout client 86400000",
+             "mode http",
+             "balance source",
+             "timeout server 30000",
+             "timeout connect 4000",
+             "hash-type consistent",
+             "http-request set-header X-Forwarded-Proto https if { ssl_fc }",
+             "http-request set-header X-Forwarded-Proto http if !{ ssl_fc }",
+             "option httpchk GET /",
+             "option forwardfor",
+             "redirect scheme https code 301 if { hdr(host) -i " + str(vip) + " } !{ ssl_fc }",
+             "rsprep ^Location:\\ http://(.*) Location:\\ https://\\1",
          ],
          "servers": [[name, addr, 8143,
-            "check fall 5 inter 2000 rise 2 ssl verify none"]]},
+                      "check fall 5 inter 2000 rise 2 ssl verify none"]]},
     ]
 
 
@@ -587,9 +588,59 @@ def nrpe_external_master_relation_changed():
 
 @hooks.hook('contrail-issu-relation-changed')
 def contrail_issu_relation_changed():
-    data = relation_get()
-    #взять и распечатать новые данные для карузе
-    log(data)
+    data_relation = relation_get()
+    data_local = {"rabbit_password": "guest",
+                  "rabbit_q_name": "vnc-config.issu-queue",
+                  "rabbit_vhost": "contrail",
+                  "rabbit_port": "5672",
+                  "rabbit_address_list": "127.0.0.1",
+                  "cassandra_user": "admin",
+                  "cassandra_password": "pusto",
+                  "cassandra_address_list": "127.0.0.1",
+                  "zookeeper_address_list": "127.0.0.1"
+                  }
+
+    settings = {
+        "api-vip": config.get("vip"),
+        "analytics-server": json.dumps(utils.get_analytics_list()),
+        "auth-mode": config.get("auth-mode"),
+        "auth-info": config.get("auth_info"),
+        "orchestrator-info": config.get("orchestrator_info"),
+        "agents-info": config.get("agents-info"),
+        "ssl-enabled": config.get("ssl_enabled") and config.get("config_analytics_ssl_available"),
+        # base64 encoded ca-cert
+        "ca-cert": config.get("ca_cert"),
+        "rabbit_user": "guest",
+        "rabbit_password": "guest",
+        "rabbit_q_name": "vnc-config.issu-queue",
+        "rabbit_vhost": "contrail",
+        "rabbit_port": "5672",
+        "rabbit_address_list": "127.0.0.1",
+        "cassandra_user": "admin",
+        "cassandra_password": "pusto",
+        "cassandra_address_list": "127.0.0.1",
+        "zookeeper_address_list": "127.0.0.1",
+    }
+
+    def print_data(data_relation, data_local):
+        log("old_rabbit_user = " + data_relation.get("rabbit_user"))
+        log("old_rabbit_password = " + data_relation.get("rabbit_password"))
+        log("old_rabbit_q_name = " + data_relation.get("rabbit_q_name"))
+        log("old_vhost = " + data_relation.get("rabbit_vhost"))
+        log("old_rabbit_port = " + data_relation.get("rabbit_port"))
+        log("old_rabbit_address_list = " + data_relation.get("rabbit_address_list"))
+        log("new_rabbit_q_name = " + data_local.get("rabbit_q_name"))
+        log("new_rabbit_vhost = " + data_local.get("rabbit_vhost"))
+        log("new_rabbit_port = " + data_local.get("rabbit_port"))
+        log("new_rabbit_address_list = " + data_local.get("rabbit_address_list"))
+        log("old_cassandra_user = " + data_relation.get("cassandra_user"))
+        log("old_cassandra_password = " + data_relation.get("cassandra_password"))
+        log("old_cassandra_address_list = " + data_relation.get("cassandra_address_list"))
+        log("old_zookeper_address_list = " + data_relation.get("zookeper_address_list"))
+        log("new_zookeper_address_list = " + data_local.get("zookeper_address_list"))
+
+    print_data(data_relation, data_local)
+
 
 def update_nrpe_config():
     plugins_dir = '/usr/local/lib/nagios/plugins'
