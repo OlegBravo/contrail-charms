@@ -11,3 +11,4 @@
   "cassandra_address_list": "127.0.0.1",
   "zookeeper_address_list": "127.0.0.1"
 }
+
