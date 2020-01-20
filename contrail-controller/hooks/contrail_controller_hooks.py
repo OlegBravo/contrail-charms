@@ -605,28 +605,6 @@ def contrail_issu_relation_changed():
                   "zookeeper_address_list": "127.0.0.1"
                   }
 
-    settings = {
-        "api-vip": config.get("vip"),
-        "analytics-server": json.dumps(utils.get_analytics_list()),
-        "auth-mode": config.get("auth-mode"),
-        "auth-info": config.get("auth_info"),
-        "orchestrator-info": config.get("orchestrator_info"),
-        "agents-info": config.get("agents-info"),
-        "ssl-enabled": config.get("ssl_enabled") and config.get("config_analytics_ssl_available"),
-        # base64 encoded ca-cert
-        "ca-cert": config.get("ca_cert"),
-        "rabbit_user": "guest",
-        "rabbit_password": "guest",
-        "rabbit_q_name": "vnc-config.issu-queue",
-        "rabbit_vhost": "contrail",
-        "rabbit_port": "5672",
-        "rabbit_address_list": "127.0.0.1",
-        "cassandra_user": "admin",
-        "cassandra_password": "pusto",
-        "cassandra_address_list": "127.0.0.1",
-        "zookeeper_address_list": "127.0.0.1",
-    }
-
     def print_data(data_relation, data_local):
         log("old_rabbit_user = " + data_relation.get("rabbit_user"))
         log("old_rabbit_password = " + data_relation.get("rabbit_password"))
