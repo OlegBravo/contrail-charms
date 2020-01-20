@@ -2,6 +2,8 @@
 
 import json
 import sys
+import traceback
+
 import yaml
 from socket import gethostbyname, gethostname, getfqdn
 
@@ -607,22 +609,34 @@ def contrail_issu_relation_changed():
                   }
 
     def print_data(data_relation, data_local):
-        log("old_rabbit_user = " + data_relation.get("rabbit_user"))
-        log("old_rabbit_password = " + data_relation.get("rabbit_password"))
-        log("old_rabbit_q_name = " + data_relation.get("rabbit_q_name"))
-        log("old_vhost = " + data_relation.get("rabbit_vhost"))
-        log("old_rabbit_port = " + data_relation.get("rabbit_port"))
-        log("old_rabbit_address_list = " + data_relation.get("rabbit_address_list"))
-        log("new_rabbit_q_name = " + data_local.get("rabbit_q_name"))
-        log("new_rabbit_vhost = " + data_local.get("rabbit_vhost"))
-        log("new_rabbit_port = " + data_local.get("rabbit_port"))
-        log("new_rabbit_address_list = " + data_local.get("rabbit_address_list"))
-        log("old_cassandra_user = " + data_relation.get("cassandra_user"))
-        log("old_cassandra_password = " + data_relation.get("cassandra_password"))
-        log("old_cassandra_address_list = " + data_relation.get("cassandra_address_list"))
-        log("old_zookeeper_address_list = " + data_relation.get("zookeeper_address_list"))
-        log("new_zookeeper_address_list = " + data_local.get("zookeeper_address_list"))
-    print_data(data_relation, data_local)
+        f = open("issu.conf", "w+")
+        f.write("old_rabbit_user = " + str(data_relation.get("rabbit_user")))
+        f.write("old_rabbit_password = " + str(data_relation.get("rabbit_password")))
+        f.write("old_rabbit_q_name = " + str(data_relation.get("rabbit_q_name")))
+        f.write("old_vhost = " + str(data_relation.get("rabbit_vhost")))
+        f.write("old_rabbit_port = " + str(data_relation.get("rabbit_port")))
+        f.write("old_rabbit_address_list = " + str(data_relation.get("rabbit_address_list")))
+        f.write("new_rabbit_q_name = " + str(data_local.get("rabbit_q_name")))
+        f.write("new_rabbit_vhost = " + str(data_local.get("rabbit_vhost")))
+        f.write("new_rabbit_port = " + str(data_local.get("rabbit_port")))
+        f.write("new_rabbit_address_list = " + str(data_local.get("rabbit_address_list")))
+        f.write("old_cassandra_user = " + str(data_relation.get("cassandra_user")))
+        f.write("old_cassandra_password = " + str(data_relation.get("cassandra_password")))
+        f.write("old_cassandra_address_list = " + str(data_relation.get("cassandra_address_list")))
+        f.write("old_zookeeper_address_list = " + str(data_relation.get("zookeeper_address_list")))
+        f.write("new_zookeeper_address_list = " + str(data_local.get("zookeeper_address_list")))
+    try:
+        print_data(data_relation, data_local)
+    # except:
+    #     e = sys.exc_info()[0]
+    #     log(e)
+    except Exception as err:
+        exc_type, exc_value, exc_tb = sys.exc_info()
+        tbe = traceback.TracebackException(
+            exc_type, exc_value, exc_tb,
+        )
+        log(''.join(tbe.format()))
+    # docker_utils.run
 
 
 def update_nrpe_config():
