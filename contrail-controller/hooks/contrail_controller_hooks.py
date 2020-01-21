@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import pathlib
 import sys
 import traceback
 
@@ -277,18 +278,6 @@ def update_southbound_relations(rid=None):
         "ssl-enabled": config.get("ssl_enabled") and config.get("config_analytics_ssl_available"),
         # base64 encoded ca-cert
         "ca-cert": config.get("ca_cert"),
-        "cassandra_user": "admin",
-        "cassandra_password": "pusto",
-        # "cassandra_address_list": utils.get_cassandra_address_list(),
-        "cassandra_address_list": "127.0.0.1",
-        "rabbit_user": "guest",
-        "rabbit_password": "guest",
-        "rabbit_q_name": "vnc-config.issu-queue",
-        "rabbit_vhost": "contrail",
-        "rabbit_port": "5672",
-        # "rabbit_address_list": ,
-        "rabbit_address_list": "127.0.0.1",
-        "zookeeper_address_list": "127.0.0.1",
     }
 
     def get_cassandra_connection_details():
@@ -309,7 +298,7 @@ def update_southbound_relations(rid=None):
             "rabbit_password": "guest",
             "rabbit_q_name": "vnc-config.issu-queue",
             "rabbit_vhost": "contrail",
-            "rabbit_port": "5673",
+            "rabbit_port": "5672",
             # "rabbit_address_list": ,
             "rabbit_address_list": "127.0.0.1",
         }
@@ -599,7 +588,7 @@ def contrail_issu_relation_changed():
     data_local = {"rabbit_password": "guest",
                   "rabbit_q_name": "vnc-config.issu-queue",
                   "rabbit_vhost": "contrail",
-                  "rabbit_port": "5672",
+                  "rabbit_port": "5673",
                   "rabbit_address_list": "127.0.0.1",
                   "cassandra_user": "admin",
                   "cassandra_password": "pusto",
@@ -626,9 +615,6 @@ def contrail_issu_relation_changed():
         f.write("new_zookeeper_address_list = " + str(data_local.get("zookeeper_address_list")))
     try:
         print_data(data_relation, data_local)
-    # except:
-    #     e = sys.exc_info()[0]
-    #     log(e)
     except Exception as err:
         exc_type, exc_value, exc_tb = sys.exc_info()
         tbe = traceback.TracebackException(
