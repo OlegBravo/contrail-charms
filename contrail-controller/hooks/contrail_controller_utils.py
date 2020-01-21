@@ -346,7 +346,3 @@ def get_rabbitmq_connection_details():
         "rabbit_port": "5673",
         "rabbit_address_list": ips,
     }
-
-
-def get_base_config_path():
-    return BASE_CONFIGS_PATH

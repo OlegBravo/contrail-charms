@@ -563,16 +563,12 @@ def nrpe_external_master_relation_changed():
 
 @hooks.hook('contrail-issu-relation-changed')
 def contrail_issu_relation_changed():
-    # TODO Keep function private or move to obj ?
-    config_path = utils.get_base_config_path()
-
     ctx = {'old': relation_get()}
     ctx["new"] = utils.get_cassandra_connection_details()
     ctx["new"].update(utils.get_rabbitmq_connection_details)
     ctx["new"].update(utils.get_zookeeper_connection_details)
 
-    # TODO make template path absolute?
-    common_utils.render_and_log(template="templates/issu.conf", conf_file=config_path + "/issu.conf", ctx=ctx)
+    common_utils.render_and_log("issu.conf" ,utils.BASE_CONFIGS_PATH + "/issu.conf", ctx)
     # TODO run docker
 
 
