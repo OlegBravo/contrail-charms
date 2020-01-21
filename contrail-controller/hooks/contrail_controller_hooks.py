@@ -2,7 +2,6 @@
 
 import json
 import sys
-
 import yaml
 from socket import gethostbyname, gethostname, getfqdn
 
@@ -383,7 +382,7 @@ def contrail_auth_changed():
 @hooks.hook("contrail-auth-relation-departed")
 def contrail_auth_departed():
     units = [unit for rid in relation_ids("contrail-auth")
-                  for unit in related_units(rid)]
+             for unit in related_units(rid)]
     if units:
         return
     config.pop("auth_info", None)
@@ -568,7 +567,7 @@ def contrail_issu_relation_changed():
     ctx["new"].update(utils.get_rabbitmq_connection_details)
     ctx["new"].update(utils.get_zookeeper_connection_details)
 
-    common_utils.render_and_log("issu.conf" ,utils.BASE_CONFIGS_PATH + "/issu.conf", ctx)
+    common_utils.render_and_log("issu.conf", utils.BASE_CONFIGS_PATH + "/issu.conf", ctx)
     # TODO run docker
 
 
