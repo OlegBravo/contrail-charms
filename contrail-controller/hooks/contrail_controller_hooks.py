@@ -290,34 +290,33 @@ def update_southbound_relations(rid=None):
         "rabbit_address_list": "127.0.0.1",
         "zookeeper_address_list": "127.0.0.1",
     }
-    # for rid in ([rid] if rid else relation_ids("contrail-controller")):
-    #     log("123 utype == issu")
-    #     rabbit_info = {
-    #         "rabbit_user": "guest",
-    #         "rabbit_password": "guest",
-    #         "rabbit_q_name": "vnc-config.issu-queue",
-    #         "rabbit_vhost": "contrail",
-    #         "rabbit_port": "5672",
-    #         # "rabbit_address_list": ,
-    #         "rabbit_address_list": "127.0.0.1",
-    #     }
-    #
-    #     cassandra_info = {
-    #         "cassandra_user": "admin",
-    #         "cassandra_password": "pusto",
-    #         # "cassandra_address_list": utils.get_cassandra_address_list(),
-    #         "cassandra_address_list": "127.0.0.1",
-    #     }
-    #
-    #     zookeper_info = {
-    #         # "zookeeper_address_list": utils.get_zookeeper_address_list(),
-    #         "zookeeper_address_list": "127.0.0.1",
-    #     }
-    #
-    #     relation_set(relation_id, relation_rabbit=rabbit_info, relation_cassandra=cassandra_info,
-    #                  relation_zookeper=zookeper_info)
+
+    def get_cassandra_connection_details():
+        return {
+            "cassandra_user": "admin",
+            "cassandra_password": "pusto",
+            "cassandra_address_list": "127.0.0.1",
+        }
+
+    def get_zookeeper_connection_details():
+        return {
+                    "zookeeper_address_list": "127.0.0.1",
+        }
+
+    def get_rabbitmq_connection_details():
+        return {
+            "rabbit_user": "guest",
+            "rabbit_password": "guest",
+            "rabbit_q_name": "vnc-config.issu-queue",
+            "rabbit_vhost": "contrail",
+            "rabbit_port": "5672",
+            # "rabbit_address_list": ,
+            "rabbit_address_list": "127.0.0.1",
+        }
+
+
     for rid in ([rid] if rid else relation_ids("contrail-controller")):
-        relation_set(relation_id=rid, relation_settings=settings)
+        relation_set(relation_id=rid, relation_settings=settings , cassandra_settings= get_cassandra_connection_details() , rabbit_setting = get_rabbitmq_connection_details() , zookeper_settings=get_zookeeper_connection_details() )
 
 
 @hooks.hook("contrail-controller-relation-joined")
@@ -636,7 +635,6 @@ def contrail_issu_relation_changed():
             exc_type, exc_value, exc_tb,
         )
         log(''.join(tbe.format()))
-    # docker_utils.run
 
 
 def update_nrpe_config():
