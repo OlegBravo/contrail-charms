@@ -564,8 +564,8 @@ def nrpe_external_master_relation_changed():
 def contrail_issu_relation_changed():
     ctx = {'old': relation_get()}
     ctx["new"] = utils.get_cassandra_connection_details()
-    ctx["new"].update(utils.get_rabbitmq_connection_details)
-    ctx["new"].update(utils.get_zookeeper_connection_details)
+    ctx["new"].update(utils.get_rabbitmq_connection_details())
+    ctx["new"].update(utils.get_zookeeper_connection_details())
 
     common_utils.render_and_log("issu.conf", utils.BASE_CONFIGS_PATH + "/issu.conf", ctx)
     # TODO run docker
