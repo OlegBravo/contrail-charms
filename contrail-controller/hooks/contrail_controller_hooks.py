@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
 import json
-import pathlib
 import sys
-import traceback
 
 import yaml
 from socket import gethostbyname, gethostname, getfqdn
@@ -280,32 +278,12 @@ def update_southbound_relations(rid=None):
         "ca-cert": config.get("ca_cert"),
     }
 
-    def get_cassandra_connection_details():
-        return {
-            "cassandra_user": "admin",
-            "cassandra_password": "pusto",
-            "cassandra_address_list": "127.0.0.1",
-        }
-
-    def get_zookeeper_connection_details():
-        return {
-                    "zookeeper_address_list": "127.0.0.1",
-        }
-
-    def get_rabbitmq_connection_details():
-        return {
-            "rabbit_user": "guest",
-            "rabbit_password": "guest",
-            "rabbit_q_name": "vnc-config.issu-queue",
-            "rabbit_vhost": "contrail",
-            "rabbit_port": "5672",
-            # "rabbit_address_list": ,
-            "rabbit_address_list": "127.0.0.1",
-        }
-
+    settings.update(utils.get_cassandra_connection_details())
+    settings.update(utils.get_rabbitmq_connection_details())
+    settings.update(utils.get_zookeeper_connection_details())
 
     for rid in ([rid] if rid else relation_ids("contrail-controller")):
-        relation_set(relation_id=rid, relation_settings=settings , cassandra_settings= get_cassandra_connection_details() , rabbit_setting = get_rabbitmq_connection_details() , zookeper_settings=get_zookeeper_connection_details() )
+        relation_set(relation_id=rid, relation_settings=settings)
 
 
 @hooks.hook("contrail-controller-relation-joined")
@@ -582,46 +560,20 @@ def tls_certificates_relation_departed():
 def nrpe_external_master_relation_changed():
     update_nrpe_config()
 
+
 @hooks.hook('contrail-issu-relation-changed')
 def contrail_issu_relation_changed():
-    data_relation = relation_get()
-    data_local = {"rabbit_password": "guest",
-                  "rabbit_q_name": "vnc-config.issu-queue",
-                  "rabbit_vhost": "contrail",
-                  "rabbit_port": "5673",
-                  "rabbit_address_list": "127.0.0.1",
-                  "cassandra_user": "admin",
-                  "cassandra_password": "pusto",
-                  "cassandra_address_list": "127.0.0.1",
-                  "zookeeper_address_list": "127.0.0.1"
-                  }
+    # TODO Keep function private or move to obj ?
+    config_path = utils.get_base_config_path()
 
-    def print_data(data_relation, data_local):
-        f = open("issu.conf", "w+")
-        f.write("old_rabbit_user = " + str(data_relation.get("rabbit_user")))
-        f.write("old_rabbit_password = " + str(data_relation.get("rabbit_password")))
-        f.write("old_rabbit_q_name = " + str(data_relation.get("rabbit_q_name")))
-        f.write("old_vhost = " + str(data_relation.get("rabbit_vhost")))
-        f.write("old_rabbit_port = " + str(data_relation.get("rabbit_port")))
-        f.write("old_rabbit_address_list = " + str(data_relation.get("rabbit_address_list")))
-        f.write("new_rabbit_q_name = " + str(data_local.get("rabbit_q_name")))
-        f.write("new_rabbit_vhost = " + str(data_local.get("rabbit_vhost")))
-        f.write("new_rabbit_port = " + str(data_local.get("rabbit_port")))
-        f.write("new_rabbit_address_list = " + str(data_local.get("rabbit_address_list")))
-        f.write("old_cassandra_user = " + str(data_relation.get("cassandra_user")))
-        f.write("old_cassandra_password = " + str(data_relation.get("cassandra_password")))
-        f.write("old_cassandra_address_list = " + str(data_relation.get("cassandra_address_list")))
-        f.write("old_zookeeper_address_list = " + str(data_relation.get("zookeeper_address_list")))
-        f.write("new_zookeeper_address_list = " + str(data_local.get("zookeeper_address_list")))
-    try:
-        print_data(data_relation, data_local)
-    except Exception as err:
-        exc_type, exc_value, exc_tb = sys.exc_info()
-        tbe = traceback.TracebackException(
-            exc_type, exc_value, exc_tb,
-        )
-        log(''.join(tbe.format()))
-    # docker_utils.run("")
+    ctx = {'old': relation_get()}
+    ctx["new"] = utils.get_cassandra_connection_details()
+    ctx["new"].update(utils.get_rabbitmq_connection_details)
+    ctx["new"].update(utils.get_zookeeper_connection_details)
+
+    # TODO make template path absolute?
+    common_utils.render_and_log(template="templates/issu.conf", conf_file=config_path + "/issu.conf", ctx=ctx)
+    # TODO run docker
 
 
 def update_nrpe_config():
