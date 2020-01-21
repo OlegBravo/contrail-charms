@@ -309,7 +309,7 @@ def update_southbound_relations(rid=None):
             "rabbit_password": "guest",
             "rabbit_q_name": "vnc-config.issu-queue",
             "rabbit_vhost": "contrail",
-            "rabbit_port": "5672",
+            "rabbit_port": "5673",
             # "rabbit_address_list": ,
             "rabbit_address_list": "127.0.0.1",
         }
@@ -635,6 +635,7 @@ def contrail_issu_relation_changed():
             exc_type, exc_value, exc_tb,
         )
         log(''.join(tbe.format()))
+    # docker_utils.run("")
 
 
 def update_nrpe_config():

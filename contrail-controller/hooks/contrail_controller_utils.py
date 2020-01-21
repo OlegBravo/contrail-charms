@@ -322,4 +322,3 @@ def update_rabbitmq_cluster_hostnames():
     """Updates /etc/hosts with rabbitmq cluster node hostnames"""
     ip = common_utils.get_ip()
     update_hosts_file(ip, get_contrail_rabbit_hostname())
-
