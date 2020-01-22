@@ -326,23 +326,34 @@ def update_rabbitmq_cluster_hostnames():
 
 def get_cassandra_connection_details():
     ips = get_controller_ips("unit-address", "control-network")
+    address_list = ""
+    port = "9161"
+    for i in ips:
+        address_list += ips[i] + ":{} ".format(port)
     return {
-        "cassandra_address_list": ips,
+        "cassandra_address_list": address_list,
     }
 
 
 def get_zookeeper_connection_details():
     ips = get_controller_ips("unit-address", "control-network")
+    address_list = ""
+    port = "2181"
+    for i in ips:
+        address_list += ips[i] + ":{} ".format(port)
     return {
-        "zookeeper_address_list": ips,
+        "zookeeper_address_list": address_list,
     }
 
 
 def get_rabbitmq_connection_details():
     ips = get_controller_ips("unit-address", "control-network")
+    address_list = ""
+    for i in ips:
+        address_list += ips[i] + " "
     return {
         "rabbit_q_name": "vnc-config.issu-queue",
         "rabbit_vhost": "contrail",
         "rabbit_port": "5673",
-        "rabbit_address_list": ips,
+        "rabbit_address_list": address_list[0],
     }
