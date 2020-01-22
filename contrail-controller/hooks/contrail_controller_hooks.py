@@ -636,6 +636,17 @@ def contrail_issu_relation_changed():
     # TODO run docker
 
 
+@hooks.hook('contrail-issu-relation-changed')
+def contrail_issu_relation_changed():
+    ctx = {'old': relation_get()}
+    ctx["new"] = utils.get_cassandra_connection_details()
+    ctx["new"].update(utils.get_rabbitmq_connection_details())
+    ctx["new"].update(utils.get_zookeeper_connection_details())
+
+    common_utils.render_and_log("issu.conf", utils.BASE_CONFIGS_PATH + "/issu.conf", ctx)
+    # TODO run docker
+
+
 def update_nrpe_config():
     plugins_dir = '/usr/local/lib/nagios/plugins'
     nrpe_compat = nrpe.NRPE()
