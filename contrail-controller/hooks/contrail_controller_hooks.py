@@ -55,8 +55,8 @@ def install():
 
 @hooks.hook("leader-elected")
 def leader_elected():
-    for var_name in [("ip", "unit-address", "control-network"),
-                     ("data_ip", "data-address", "data-network")]:
+    for var_name in [("ip","unit-address","control-network"),
+                     ("data_ip","data-address","data-network")]:
         ip_list = common_utils.json_loads(leader_get("controller_{}_list".format(var_name[0])), list())
         ips = utils.get_controller_ips(var_name[1], var_name[2])
         if not ip_list:
@@ -495,16 +495,16 @@ def _https_services_tcp(vip):
          "service_host": vip,
          "service_port": 8143,
          "service_options": [
-             "timeout client 86400000",
-             "mode tcp",
-             "option tcplog",
-             "balance source",
-             "cookie SERVERID insert indirect nocache",
-             "timeout server 30000",
-             "timeout connect 4000",
+            "timeout client 86400000",
+            "mode tcp",
+            "option tcplog",
+            "balance source",
+            "cookie SERVERID insert indirect nocache",
+            "timeout server 30000",
+            "timeout connect 4000",
          ],
          "servers": [[name, addr, 8143,
-                      "cookie " + addr + " weight 1 maxconn 1024 check port 8143"]]},
+            "cookie " + addr + " weight 1 maxconn 1024 check port 8143"]]},
     ]
 
 
@@ -517,21 +517,21 @@ def _https_services_http(vip):
          "service_port": 8143,
          "crts": ["DEFAULT"],
          "service_options": [
-             "timeout client 86400000",
-             "mode http",
-             "balance source",
-             "timeout server 30000",
-             "timeout connect 4000",
-             "hash-type consistent",
-             "http-request set-header X-Forwarded-Proto https if { ssl_fc }",
-             "http-request set-header X-Forwarded-Proto http if !{ ssl_fc }",
-             "option httpchk GET /",
-             "option forwardfor",
-             "redirect scheme https code 301 if { hdr(host) -i " + str(vip) + " } !{ ssl_fc }",
-             "rsprep ^Location:\\ http://(.*) Location:\\ https://\\1",
+            "timeout client 86400000",
+            "mode http",
+            "balance source",
+            "timeout server 30000",
+            "timeout connect 4000",
+            "hash-type consistent",
+            "http-request set-header X-Forwarded-Proto https if { ssl_fc }",
+            "http-request set-header X-Forwarded-Proto http if !{ ssl_fc }",
+            "option httpchk GET /",
+            "option forwardfor",
+            "redirect scheme https code 301 if { hdr(host) -i " + str(vip) + " } !{ ssl_fc }",
+            "rsprep ^Location:\\ http://(.*) Location:\\ https://\\1",
          ],
          "servers": [[name, addr, 8143,
-                      "check fall 5 inter 2000 rise 2 ssl verify none"]]},
+            "check fall 5 inter 2000 rise 2 ssl verify none"]]},
     ]
 
 
