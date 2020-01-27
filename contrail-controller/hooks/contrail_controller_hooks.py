@@ -270,7 +270,8 @@ def update_southbound_relations(rid=None):
         "analytics-server": json.dumps(utils.get_analytics_list()),
         "auth-mode": config.get("auth-mode"),
         "auth-info": config.get("auth_info"),
-        "orchestrator-info": config.get("orchestrator_info"),
+        # "orchestrator-info": config.get("orchestrator_info"),
+        "orchestrator-info": {"cloud_orchestrator": "openstack", "metadata_shared_secret": "390988bd-e7d9-48aa-948c-7f1db78f3488", "compute_service_ip": "10.0.12.124", "image_service_ip": "10.0.12.109", "network_service_ip": "10.0.12.127"},
         "agents-info": config.get("agents-info"),
         "ssl-enabled": config.get("ssl_enabled") and config.get("config_analytics_ssl_available"),
         # base64 encoded ca-cert
@@ -570,6 +571,10 @@ def contrail_issu_relation_changed():
     common_utils.render_and_log("issu.conf", utils.BASE_CONFIGS_PATH + "/issu.conf", ctx)
     # TODO run docker
 
+    if "orchestrator-info" in ctx["old"]:
+        config["orchestrator_info"] = ctx["old"]["orchestrator-info"]
+
+    update_southbound_relations()
 
 def update_nrpe_config():
     plugins_dir = '/usr/local/lib/nagios/plugins'
