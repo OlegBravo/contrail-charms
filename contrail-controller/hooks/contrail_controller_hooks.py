@@ -572,8 +572,11 @@ def contrail_issu_relation_changed():
 
     if "orchestrator-info" in ctx["old"]:
         config["orchestrator_info"] = ctx["old"]["orchestrator-info"]
+        config.save()
 
-    update_southbound_relations()
+    update_northbound_relations()
+    utils.update_charm_status()
+
 
 def update_nrpe_config():
     plugins_dir = '/usr/local/lib/nagios/plugins'
