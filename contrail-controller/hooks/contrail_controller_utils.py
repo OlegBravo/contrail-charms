@@ -334,7 +334,7 @@ def get_cassandra_connection_details():
 def get_zookeeper_connection_details():
     ips = get_controller_ips("unit-address", "control-network")
     return {
-        "zookeeper_address_list": ips[0],
+        "zookeeper_address_list": ips,
     }
 
 
@@ -344,5 +344,5 @@ def get_rabbitmq_connection_details():
         "rabbit_q_name": "vnc-config.issu-queue",
         "rabbit_vhost": "contrail",
         "rabbit_port": "5673",
-        "rabbit_address_list": ips[0],
+        "rabbit_address_list": ips,
     }
